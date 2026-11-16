@@ -8,23 +8,27 @@ import {
   Plus,
   RefreshCw,
   Settings,
+  Sparkles,
 } from 'lucide-react';
-import { useTasks } from './hooks/use-tasks';
+import { useCreateTask, useTasks } from './hooks/use-tasks';
 import { isOverdue } from './lib/utils';
 import { Task, TaskStatus } from './types/task';
 import { CommandPalette } from './components/command-palette/CommandPalette';
 import { TaskDrawer } from './components/drawer/TaskDrawer';
 import { KanbanBoard } from './components/kanban/KanbanBoard';
-import { Navbar, ViewMode } from './components/layout/Navbar';
+import { Navbar, SortOption, ViewMode } from './components/layout/Navbar';
 import { ListView } from './components/list/ListView';
 import { CreateTaskModal } from './components/modal/CreateTaskModal';
+import { ShortcutsModal } from './components/modal/ShortcutsModal';
 import { SettingsModal } from './components/settings/SettingsModal';
+import { useToast } from './components/common/ToastContext';
 
 export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('kanban');
   const [statusFilter, setStatusFilter] = useState<TaskStatus | undefined>(undefined);
   const [assigneeFilter, setAssigneeFilter] = useState<string | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('urgency');
 
   // Modals & Panels
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -32,6 +36,10 @@ export const App: React.FC = () => {
   const [createInitialStatus, setCreateInitialStatus] = useState<TaskStatus>('pendiente');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+
+  const { showToast } = useToast();
+  const createTask = useCreateTask();
 
   // Fetch tasks with filters
   const {
@@ -58,17 +66,34 @@ export const App: React.FC = () => {
   }, [allTasks]);
 
   // Client-side search filtering (by title or description or ID)
-  const filteredTasks = useMemo(() => {
-    if (!searchQuery.trim()) return allTasks;
-    const q = searchQuery.toLowerCase().trim();
-    return allTasks.filter(
-      (t) =>
-        t.title.toLowerCase().includes(q) ||
-        t.description.toLowerCase().includes(q) ||
-        t.assignee.toLowerCase().includes(q) ||
-        String(t.id).includes(q),
-    );
-  }, [allTasks, searchQuery]);
+  const filteredAndSortedTasks = useMemo(() => {
+    let list = allTasks;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      list = list.filter(
+        (t) =>
+          t.title.toLowerCase().includes(q) ||
+          t.description.toLowerCase().includes(q) ||
+          t.assignee.toLowerCase().includes(q) ||
+          String(t.id).includes(q),
+      );
+    }
+
+    // Sort tasks
+    return [...list].sort((a, b) => {
+      switch (sortBy) {
+        case 'urgency':
+          return (a.dueDate || '').localeCompare(b.dueDate || '');
+        case 'newest':
+          return b.id - a.id;
+        case 'id_asc':
+          return a.id - b.id;
+        case 'title_asc':
+          return a.title.localeCompare(b.title);
+      }
+    });
+  }, [allTasks, searchQuery, sortBy]);
 
   // Stats
   const stats = useMemo(() => {
@@ -93,7 +118,66 @@ export const App: React.FC = () => {
     };
   }, [allTasks]);
 
-  // Global Keyboard shortcuts: C (new), 1 (kanban), 2 (list), Cmd+K (palette)
+  const hasActiveFilters = Boolean(statusFilter || assigneeFilter || searchQuery);
+
+  const handleClearFilters = () => {
+    setStatusFilter(undefined);
+    setAssigneeFilter(undefined);
+    setSearchQuery('');
+  };
+
+  // Seed realistic demo tasks if empty
+  const handleSeedDemoTasks = async () => {
+    const today = new Date();
+    const inDays = (n: number) => {
+      const d = new Date(today);
+      d.setDate(d.getDate() + n);
+      return d.toISOString().split('T')[0] ?? '';
+    };
+
+    const demoTasks = [
+      {
+        title: 'Auditar seguridad y rate-limiting en tasks-api',
+        description: 'Verificar los límites de 300 req/min y los encabezados RFC 7807.',
+        status: 'en_curso' as TaskStatus,
+        assignee: 'Ana',
+        dueDate: inDays(1),
+      },
+      {
+        title: 'Diseñar atajos de teclado y experiencia tipo Linear',
+        description: 'Soporte completo para J/K, Espacio, Enter y Paleta de Comandos.',
+        status: 'hecha' as TaskStatus,
+        assignee: 'Carlos',
+        dueDate: inDays(3),
+      },
+      {
+        title: 'Implementar pruebas E2E y verificación de tipos estricta',
+        description: 'Garantizar cero regresiones en los flujos CRUD optimistas.',
+        status: 'pendiente' as TaskStatus,
+        assignee: 'Elena',
+        dueDate: inDays(5),
+      },
+    ];
+
+    try {
+      for (const t of demoTasks) {
+        await createTask.mutateAsync(t);
+      }
+      showToast({
+        type: 'success',
+        title: 'Tareas de ejemplo cargadas',
+        description: 'Se crearon 3 tareas con diferentes estados para explorar la app',
+      });
+    } catch {
+      showToast({
+        type: 'error',
+        title: 'No se pudieron crear tareas',
+        description: 'Verifica la conexión con tasks-api en Ajustes',
+      });
+    }
+  };
+
+  // Global Keyboard shortcuts: C (new), 1 (kanban), 2 (list), Cmd+K (palette), ? (shortcuts)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) {
@@ -109,6 +193,12 @@ export const App: React.FC = () => {
       if (e.key === '/') {
         e.preventDefault();
         setIsCommandPaletteOpen(true);
+        return;
+      }
+
+      if (e.key === '?') {
+        e.preventDefault();
+        setIsShortcutsOpen(true);
         return;
       }
 
@@ -148,12 +238,17 @@ export const App: React.FC = () => {
         assignees={knownAssignees}
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        hasActiveFilters={hasActiveFilters}
+        onClearFilters={handleClearFilters}
         onOpenCreateModal={() => {
           setCreateInitialStatus('pendiente');
           setIsCreateOpen(true);
         }}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
         totalTasks={stats.total}
       />
 
@@ -283,39 +378,49 @@ export const App: React.FC = () => {
             {allTasks.length === 0 ? (
               <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl p-16 text-center space-y-4 max-w-md mx-auto my-8">
                 <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mx-auto">
-                  <Plus className="w-6 h-6" />
+                  <Sparkles className="w-6 h-6" />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-zinc-100">
                     Comienza con tu primera tarea
                   </h3>
                   <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                    tasks-api está listo y conectado. Crea una tarea presionando la tecla{' '}
+                    tasks-api está listo y conectado. Crea una tarea manualmente con la tecla{' '}
                     <kbd className="font-mono px-1 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-300">
                       C
                     </kbd>{' '}
-                    o el botón a continuación.
+                    o carga datos de prueba para explorar la interfaz.
                   </p>
                 </div>
-                <button
-                  onClick={() => {
-                    setCreateInitialStatus('pendiente');
-                    setIsCreateOpen(true);
-                  }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition-all"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Crear Tarea</span>
-                </button>
+                <div className="flex items-center justify-center gap-3 pt-2">
+                  <button
+                    onClick={() => {
+                      setCreateInitialStatus('pendiente');
+                      setIsCreateOpen(true);
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition-all"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Crear Tarea</span>
+                  </button>
+                  <button
+                    onClick={handleSeedDemoTasks}
+                    disabled={createTask.isPending}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-750 border border-zinc-700 text-zinc-200 text-xs font-semibold transition-all"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Cargar demo</span>
+                  </button>
+                </div>
               </div>
             ) : viewMode === 'kanban' ? (
               <KanbanBoard
-                tasks={filteredTasks}
+                tasks={filteredAndSortedTasks}
                 onSelectTask={setSelectedTask}
                 onQuickCreateInStatus={handleQuickCreateInStatus}
               />
             ) : (
-              <ListView tasks={filteredTasks} onSelectTask={setSelectedTask} />
+              <ListView tasks={filteredAndSortedTasks} onSelectTask={setSelectedTask} />
             )}
           </>
         )}
@@ -338,6 +443,9 @@ export const App: React.FC = () => {
 
       {/* Settings Modal */}
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+
+      {/* Keyboard Shortcuts Modal */}
+      <ShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
 
       {/* Command Palette */}
       <CommandPalette

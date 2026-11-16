@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar, ChevronRight, Clock, Trash2 } from 'lucide-react';
 import { useDeleteTask, useUpdateTask } from '../../hooks/use-tasks';
+import { playSuccessChime, playTick } from '../../lib/sound';
 import { cn, formatDisplayDate, getNextStatus, isOverdue, STATUS_CONFIG } from '../../lib/utils';
 import { Task } from '../../types/task';
 import { Avatar } from '../common/Avatar';
@@ -43,6 +44,11 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
         const selectedTask = tasks[selectedIndex];
         if (selectedTask) {
           const next = getNextStatus(selectedTask.status);
+          if (next === 'hecha') {
+            playSuccessChime();
+          } else {
+            playTick();
+          }
           updateTask.mutate({ id: selectedTask.id, input: { status: next } });
         }
       }
@@ -99,6 +105,11 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
                   onClick={(e) => {
                     e.stopPropagation();
                     const next = getNextStatus(task.status);
+                    if (next === 'hecha') {
+                      playSuccessChime();
+                    } else {
+                      playTick();
+                    }
                     updateTask.mutate({ id: task.id, input: { status: next } });
                   }}
                   className={cn(

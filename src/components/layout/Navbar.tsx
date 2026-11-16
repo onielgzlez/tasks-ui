@@ -1,20 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ArrowUpDown,
   CheckSquare,
   Columns3,
   Filter,
+  HelpCircle,
   List as ListIcon,
   Plus,
   RefreshCw,
+  RotateCcw,
   Search,
   Settings as SettingsIcon,
   User,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { useConnectionStatus } from '../../hooks/use-tasks';
+import { isSoundEnabled, setSoundEnabled } from '../../lib/sound';
 import { cn } from '../../lib/utils';
 import { TaskStatus } from '../../types/task';
 
 export type ViewMode = 'kanban' | 'list';
+export type SortOption = 'urgency' | 'newest' | 'id_asc' | 'title_asc';
 
 interface NavbarProps {
   viewMode: ViewMode;
@@ -26,9 +33,14 @@ interface NavbarProps {
   assignees: string[];
   searchQuery: string;
   onSearchQueryChange: (q: string) => void;
+  sortBy: SortOption;
+  onSortByChange: (sort: SortOption) => void;
+  hasActiveFilters: boolean;
+  onClearFilters: () => void;
   onOpenCreateModal: () => void;
   onOpenSettings: () => void;
   onOpenCommandPalette: () => void;
+  onOpenShortcuts: () => void;
   totalTasks: number;
 }
 
@@ -42,15 +54,33 @@ export const Navbar: React.FC<NavbarProps> = ({
   assignees,
   searchQuery,
   onSearchQueryChange,
+  sortBy,
+  onSortByChange,
+  hasActiveFilters,
+  onClearFilters,
   onOpenCreateModal,
   onOpenSettings,
   onOpenCommandPalette,
+  onOpenShortcuts,
   totalTasks,
 }) => {
   const { status: connStatus, checking, refetch } = useConnectionStatus();
+  const [sound, setSound] = useState(isSoundEnabled);
+
+  useEffect(() => {
+    const handler = () => setSound(isSoundEnabled());
+    window.addEventListener('tasks_studio_sound_change', handler);
+    return () => window.removeEventListener('tasks_studio_sound_change', handler);
+  }, []);
+
+  const toggleSound = () => {
+    const next = !sound;
+    setSoundEnabled(next);
+    setSound(next);
+  };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl transition-all">
+    <header className="sticky top-0 z-30 border-b border-zinc-800/80 bg-zinc-950/85 backdrop-blur-xl transition-all">
       {/* Top Main Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Brand & Connection Badge */}
@@ -184,6 +214,32 @@ export const Navbar: React.FC<NavbarProps> = ({
             </kbd>
           </button>
 
+          {/* Sound Mute / Unmute Button */}
+          <button
+            onClick={toggleSound}
+            className="p-1.5 rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition-colors"
+            title={
+              sound
+                ? 'Efectos de sonido activados (clic para silenciar)'
+                : 'Efectos de sonido silenciados'
+            }
+          >
+            {sound ? (
+              <Volume2 className="w-4 h-4 text-indigo-400" />
+            ) : (
+              <VolumeX className="w-4 h-4 text-zinc-600" />
+            )}
+          </button>
+
+          {/* Keyboard Shortcuts Helper Button */}
+          <button
+            onClick={onOpenShortcuts}
+            className="p-1.5 rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition-colors"
+            title="Atajos de teclado (?)"
+          >
+            <HelpCircle className="w-4 h-4" />
+          </button>
+
           {/* Settings Button */}
           <button
             onClick={onOpenSettings}
@@ -195,7 +251,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Sub-bar with Filters */}
+      {/* Sub-bar with Filters & Sorting */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-800/40 text-xs">
         {/* Status Filters */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
@@ -218,7 +274,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className={cn(
                   'px-2.5 py-1 rounded-md text-xs transition-colors whitespace-nowrap',
                   isSelected
-                    ? 'bg-zinc-800 text-zinc-100 font-medium border border-zinc-700/60'
+                    ? 'bg-zinc-800 text-zinc-100 font-medium border border-zinc-700/60 shadow-sm'
                     : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60',
                 )}
               >
@@ -226,12 +282,24 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             );
           })}
+
+          {/* Clear Filters Button if any active */}
+          {hasActiveFilters && (
+            <button
+              onClick={onClearFilters}
+              className="ml-2 flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-colors"
+              title="Restablecer todos los filtros"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Limpiar filtros</span>
+            </button>
+          )}
         </div>
 
-        {/* Assignee Filter & Mobile search */}
-        <div className="flex items-center gap-2">
+        {/* Assignee Filter, Sort Dropdown & Mobile Search */}
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Mobile search bar */}
-          <div className="sm:hidden relative w-36">
+          <div className="sm:hidden relative w-32">
             <input
               type="text"
               placeholder="Buscar..."
@@ -239,6 +307,29 @@ export const Navbar: React.FC<NavbarProps> = ({
               onChange={(e) => onSearchQueryChange(e.target.value)}
               className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-2.5 py-1 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500"
             />
+          </div>
+
+          {/* Sort Dropdown */}
+          <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-md px-2 py-1">
+            <ArrowUpDown className="w-3 h-3 text-zinc-500" />
+            <select
+              value={sortBy}
+              onChange={(e) => onSortByChange(e.target.value as SortOption)}
+              className="bg-transparent text-xs text-zinc-300 focus:outline-none cursor-pointer pr-1"
+            >
+              <option value="urgency" className="bg-zinc-900 text-zinc-300">
+                Ordenar: Más urgentes
+              </option>
+              <option value="newest" className="bg-zinc-900 text-zinc-300">
+                Ordenar: Más recientes
+              </option>
+              <option value="id_asc" className="bg-zinc-900 text-zinc-300">
+                Ordenar: ID ascendente
+              </option>
+              <option value="title_asc" className="bg-zinc-900 text-zinc-300">
+                Ordenar: Título (A-Z)
+              </option>
+            </select>
           </div>
 
           {/* Assignee Dropdown */}

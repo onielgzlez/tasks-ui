@@ -1,6 +1,7 @@
-import React from 'react';
-import { Calendar, CheckCircle2, ChevronRight, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, CheckCircle2, ChevronRight, Clock, GripVertical } from 'lucide-react';
 import { useUpdateTask } from '../../hooks/use-tasks';
+import { playSuccessChime, playTick } from '../../lib/sound';
 import { cn, formatDisplayDate, getNextStatus, isOverdue, STATUS_CONFIG } from '../../lib/utils';
 import { Task } from '../../types/task';
 import { Avatar } from '../common/Avatar';
@@ -12,6 +13,7 @@ interface KanbanCardProps {
 }
 
 export const KanbanCard: React.FC<KanbanCardProps> = ({ task, onSelect }) => {
+  const [isDragging, setIsDragging] = useState(false);
   const updateTask = useUpdateTask();
   const overdue = isOverdue(task.dueDate, task.status);
   const statusInfo = STATUS_CONFIG[task.status];
@@ -19,26 +21,51 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({ task, onSelect }) => {
   const handleStatusCycle = (e: React.MouseEvent) => {
     e.stopPropagation();
     const nextStatus = getNextStatus(task.status);
+    if (nextStatus === 'hecha') {
+      playSuccessChime();
+    } else {
+      playTick();
+    }
     updateTask.mutate({
       id: task.id,
       input: { status: nextStatus },
     });
   };
 
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData('text/plain', String(task.id));
+    e.dataTransfer.effectAllowed = 'move';
+    setIsDragging(true);
+    playTick();
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
   return (
     <div
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       onClick={() => onSelect(task)}
-      className="group relative bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700/80 rounded-xl p-4 shadow-sm hover:shadow-md hover:shadow-black/40 transition-all duration-200 cursor-pointer active:scale-[0.99] flex flex-col gap-3"
+      className={cn(
+        'group relative bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700/80 rounded-xl p-4 shadow-sm hover:shadow-md hover:shadow-black/40 transition-all duration-200 cursor-grab active:cursor-grabbing flex flex-col gap-3',
+        isDragging && 'opacity-40 scale-95 border-indigo-500/50',
+      )}
     >
-      {/* Top Header: ID & Quick Status Advance */}
+      {/* Top Header: Drag handle, ID & Quick Status Advance */}
       <div className="flex items-center justify-between gap-2">
-        <span className="font-mono text-xs font-semibold text-zinc-500 group-hover:text-zinc-400">
-          #{task.id}
-        </span>
+        <div className="flex items-center gap-1.5 text-zinc-500">
+          <GripVertical className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition-opacity" />
+          <span className="font-mono text-xs font-semibold group-hover:text-zinc-400">
+            #{task.id}
+          </span>
+        </div>
 
         <button
           onClick={handleStatusCycle}
-          title={`Estado actual: ${statusInfo.label}. Clic para cambiar a ${STATUS_CONFIG[getNextStatus(task.status)].label}`}
+          title={`Estado actual: ${statusInfo.label}. Clic para avanzar`}
           className={cn(
             'flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all duration-150',
             statusInfo.bgBadge,

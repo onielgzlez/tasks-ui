@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
+import { useUpdateTask } from '../../hooks/use-tasks';
+import { playSuccessChime, playTick } from '../../lib/sound';
 import { cn, STATUS_CONFIG } from '../../lib/utils';
 import { Task, TaskStatus } from '../../types/task';
+import { useToast } from '../common/ToastContext';
 import { KanbanCard } from './KanbanCard';
 
 interface KanbanBoardProps {
@@ -17,17 +20,75 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onSelectTask,
   onQuickCreateInStatus,
 }) => {
+  const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null);
+  const updateTask = useUpdateTask();
+  const { showToast } = useToast();
+
+  const handleDragOver = (e: React.DragEvent, status: TaskStatus) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragOverColumn !== status) {
+      setDragOverColumn(status);
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    // Only reset if leaving the column element itself
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    setDragOverColumn(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetStatus: TaskStatus) => {
+    e.preventDefault();
+    setDragOverColumn(null);
+    const taskIdStr = e.dataTransfer.getData('text/plain');
+    if (!taskIdStr) return;
+
+    const taskId = Number(taskIdStr);
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task || task.status === targetStatus) return;
+
+    if (targetStatus === 'hecha') {
+      playSuccessChime();
+    } else {
+      playTick();
+    }
+
+    updateTask.mutate(
+      {
+        id: taskId,
+        input: { status: targetStatus },
+      },
+      {
+        onSuccess: () => {
+          showToast({
+            type: 'success',
+            title: 'Tarea movida',
+            description: `#${taskId} movida a ${STATUS_CONFIG[targetStatus].label}`,
+          });
+        },
+      },
+    );
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
       {COLUMNS.map((columnStatus) => {
         const columnTasks = tasks.filter((t) => t.status === columnStatus);
         const config = STATUS_CONFIG[columnStatus];
+        const isTarget = dragOverColumn === columnStatus;
 
         return (
           <div
             key={columnStatus}
+            onDragOver={(e) => handleDragOver(e, columnStatus)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, columnStatus)}
             className={cn(
-              'flex flex-col bg-zinc-950/60 rounded-2xl border border-zinc-800/80 p-4 min-h-[500px]',
+              'flex flex-col bg-zinc-950/60 rounded-2xl border p-4 min-h-[520px] transition-all duration-200',
+              isTarget
+                ? 'border-indigo-500/80 bg-indigo-950/20 shadow-lg shadow-indigo-500/10 ring-2 ring-indigo-500/30'
+                : 'border-zinc-800/80',
             )}
           >
             {/* Column Header */}
@@ -54,19 +115,35 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
             {/* Task List in Column */}
             <div className="flex flex-col gap-3 flex-1 overflow-y-auto max-h-[calc(100vh-250px)] pr-1">
               {columnTasks.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center border border-dashed border-zinc-850 rounded-xl my-2">
-                  <p className="text-xs text-zinc-500 font-medium">No hay tareas en esta etapa</p>
-                  <button
-                    onClick={() => onQuickCreateInStatus(columnStatus)}
-                    className="mt-2 text-xs font-semibold text-indigo-400 hover:text-indigo-300"
-                  >
-                    + Agregar tarea
-                  </button>
+                <div
+                  className={cn(
+                    'flex-1 flex flex-col items-center justify-center p-8 text-center border border-dashed rounded-xl my-2 transition-colors',
+                    isTarget ? 'border-indigo-500/60 bg-indigo-500/5' : 'border-zinc-850',
+                  )}
+                >
+                  <p className="text-xs text-zinc-500 font-medium">
+                    {isTarget ? 'Suelta aquí la tarea' : 'No hay tareas en esta etapa'}
+                  </p>
+                  {!isTarget && (
+                    <button
+                      onClick={() => onQuickCreateInStatus(columnStatus)}
+                      className="mt-2 text-xs font-semibold text-indigo-400 hover:text-indigo-300"
+                    >
+                      + Agregar tarea
+                    </button>
+                  )}
                 </div>
               ) : (
                 columnTasks.map((task) => (
                   <KanbanCard key={task.id} task={task} onSelect={onSelectTask} />
                 ))
+              )}
+
+              {/* Ghost drop indicator when dragging over a populated column */}
+              {isTarget && columnTasks.length > 0 && (
+                <div className="h-16 border-2 border-dashed border-indigo-500/50 rounded-xl bg-indigo-500/5 flex items-center justify-center text-xs text-indigo-400 font-medium">
+                  Soltar aquí para mover a {config.label}
+                </div>
               )}
             </div>
           </div>
