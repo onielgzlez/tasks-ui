@@ -259,10 +259,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                       }}
                       onMouseEnter={() => setSelectedIndex(idx)}
                       className={cn(
-                        'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs transition-colors',
+                        'w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-xs transition-colors cursor-pointer',
                         isSelected
-                          ? 'bg-zinc-850 text-zinc-100'
-                          : 'text-zinc-300 hover:bg-zinc-900',
+                          ? 'bg-zinc-800 text-zinc-100 ring-1 ring-zinc-700/60 shadow-sm'
+                          : 'text-zinc-300 hover:bg-zinc-850 hover:text-zinc-100',
                       )}
                     >
                       <div className="flex items-center gap-2.5 min-w-0 pr-2">
@@ -294,8 +294,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     onClick={() => cmd.action()}
                     onMouseEnter={() => setSelectedIndex(idx)}
                     className={cn(
-                      'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs transition-colors',
-                      isSelected ? 'bg-zinc-850 text-zinc-100' : 'text-zinc-300 hover:bg-zinc-900',
+                      'w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-xs transition-colors cursor-pointer',
+                      isSelected
+                        ? 'bg-zinc-800 text-zinc-100 ring-1 ring-zinc-700/60 shadow-sm'
+                        : 'text-zinc-300 hover:bg-zinc-850 hover:text-zinc-100',
                     )}
                   >
                     <div className="flex items-center gap-2.5">

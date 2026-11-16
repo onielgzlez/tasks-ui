@@ -50,33 +50,31 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({ task, onSelect }) => {
       onDragEnd={handleDragEnd}
       onClick={() => onSelect(task)}
       className={cn(
-        'group relative bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700/80 rounded-xl p-4 shadow-sm hover:shadow-md hover:shadow-black/40 transition-all duration-200 cursor-grab active:cursor-grabbing flex flex-col gap-3',
+        'group relative bg-zinc-900/90 hover:bg-zinc-850/95 border border-zinc-800 hover:border-zinc-650 hover:shadow-lg hover:shadow-black/50 hover:-translate-y-0.5 rounded-xl p-4 transition-all duration-150 cursor-grab active:cursor-grabbing flex flex-col gap-3',
         isDragging && 'opacity-40 scale-95 border-indigo-500/50',
       )}
     >
       {/* Top Header: Drag handle, ID & Quick Status Advance */}
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 text-zinc-500">
+        <div className="flex items-center gap-1.5 text-zinc-500 group-hover:text-zinc-400">
           <GripVertical className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition-opacity" />
-          <span className="font-mono text-xs font-semibold group-hover:text-zinc-400">
-            #{task.id}
-          </span>
+          <span className="font-mono text-xs font-semibold">#{task.id}</span>
         </div>
 
         <button
           onClick={handleStatusCycle}
-          title={`Estado actual: ${statusInfo.label}. Clic para avanzar`}
+          title={`Estado: ${statusInfo.label}. Clic para cambiar a ${STATUS_CONFIG[getNextStatus(task.status)].label}`}
           className={cn(
-            'flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all duration-150',
+            'flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border transition-all duration-150 cursor-pointer shadow-sm',
             statusInfo.bgBadge,
             statusInfo.textBadge,
             statusInfo.borderBadge,
-            'hover:scale-105 active:scale-95',
+            'hover:scale-105 hover:brightness-125 hover:shadow active:scale-95',
           )}
         >
           <span className={cn('w-1.5 h-1.5 rounded-full', statusInfo.dotColor)} />
           <span>{statusInfo.label}</span>
-          <ChevronRight className="w-3 h-3 opacity-60 group-hover:opacity-100" />
+          <ChevronRight className="w-3 h-3 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
         </button>
       </div>
 
@@ -91,14 +89,14 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({ task, onSelect }) => {
           {task.title}
         </h4>
         {task.description && (
-          <p className="text-xs text-zinc-400 line-clamp-2 mt-1 leading-relaxed">
+          <p className="text-xs text-zinc-400 group-hover:text-zinc-300 line-clamp-2 mt-1 leading-relaxed transition-colors">
             {task.description}
           </p>
         )}
       </div>
 
       {/* Footer Info: Assignee & Due Date */}
-      <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-800/60 mt-auto text-xs">
+      <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-800/80 group-hover:border-zinc-750 mt-auto text-xs transition-colors">
         <Avatar name={task.assignee} showName size="sm" />
 
         <div className="flex items-center gap-1.5">

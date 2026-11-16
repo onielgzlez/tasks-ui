@@ -80,12 +80,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-zinc-800/80 bg-zinc-950/85 backdrop-blur-xl transition-all">
+    <header className="sticky top-0 z-30 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-xl transition-all">
       {/* Top Main Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Brand & Connection Badge */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 select-none">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-700 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <CheckSquare className="w-4 h-4 text-white" />
             </div>
@@ -109,15 +109,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onOpenSettings}
             title="Haz clic para inspeccionar o cambiar credenciales de tasks-api"
             className={cn(
-              'group hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-mono border transition-all',
+              'group hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono border transition-all cursor-pointer shadow-sm active:scale-95',
               connStatus === 'connected' &&
-                'bg-emerald-950/30 border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/50',
+                'bg-emerald-950/30 border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/60 hover:border-emerald-400/50',
               connStatus === 'unauthorized' &&
-                'bg-rose-950/30 border-rose-500/30 text-rose-400 hover:bg-rose-950/50',
+                'bg-rose-950/30 border-rose-500/30 text-rose-400 hover:bg-rose-950/60 hover:border-rose-400/50',
               connStatus === 'unreachable' &&
-                'bg-amber-950/30 border-amber-500/30 text-amber-400 hover:bg-amber-950/50',
+                'bg-amber-950/30 border-amber-500/30 text-amber-400 hover:bg-amber-950/60 hover:border-amber-400/50',
               connStatus === 'no_token' &&
-                'bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800',
+                'bg-zinc-900 border-zinc-750 text-zinc-400 hover:bg-zinc-850 hover:border-zinc-600 hover:text-zinc-200',
             )}
           >
             <span className="relative flex h-2 w-2">
@@ -134,7 +134,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
               />
             </span>
-            <span className="truncate max-w-[130px]">
+            <span className="truncate max-w-[130px] font-medium">
               {connStatus === 'connected' && 'tasks-api online'}
               {connStatus === 'unauthorized' && 'Auth 401'}
               {connStatus === 'unreachable' && 'API offline (:3000)'}
@@ -142,7 +142,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
             <RefreshCw
               className={cn(
-                'w-3 h-3 text-zinc-500 group-hover:text-zinc-300 transition-transform',
+                'w-3 h-3 text-zinc-500 group-hover:text-zinc-200 transition-transform',
                 checking && 'animate-spin',
               )}
               onClick={(e) => {
@@ -158,14 +158,16 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={onOpenCommandPalette}
-            className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-zinc-900/80 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 text-xs text-zinc-400 transition-all shadow-inner group"
+            className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 text-xs text-zinc-400 hover:text-zinc-200 transition-all shadow-inner group cursor-pointer active:scale-[0.99]"
           >
             <div className="flex items-center gap-2">
-              <Search className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300" />
+              <Search className="w-3.5 h-3.5 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
               <span>Buscar o ejecutar comando...</span>
             </div>
             <div className="flex items-center gap-1 font-mono text-[10px] text-zinc-500">
-              <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700/60">⌘K</kbd>
+              <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 group-hover:bg-zinc-750 group-hover:text-zinc-300 border border-zinc-700/60 transition-colors">
+                ⌘K
+              </kbd>
             </div>
           </button>
         </div>
@@ -177,10 +179,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={() => onViewModeChange('kanban')}
               className={cn(
-                'flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-all',
+                'flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer',
                 viewMode === 'kanban'
-                  ? 'bg-zinc-800 text-zinc-100 shadow-sm shadow-black/50'
-                  : 'text-zinc-400 hover:text-zinc-200',
+                  ? 'bg-zinc-800 text-zinc-100 shadow-sm shadow-black/50 ring-1 ring-zinc-700/60'
+                  : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-850 active:scale-95',
               )}
               title="Vista Tablero Kanban (1)"
             >
@@ -190,10 +192,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={() => onViewModeChange('list')}
               className={cn(
-                'flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-all',
+                'flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer',
                 viewMode === 'list'
-                  ? 'bg-zinc-800 text-zinc-100 shadow-sm shadow-black/50'
-                  : 'text-zinc-400 hover:text-zinc-200',
+                  ? 'bg-zinc-800 text-zinc-100 shadow-sm shadow-black/50 ring-1 ring-zinc-700/60'
+                  : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-850 active:scale-95',
               )}
               title="Vista Lista Rápida (2)"
             >
@@ -205,11 +207,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* New Task Button */}
           <button
             onClick={onOpenCreateModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-medium tracking-tight shadow-md shadow-indigo-600/30 transition-all active:scale-[0.98]"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-lg text-xs font-semibold tracking-tight shadow-md shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span className="font-semibold">Nueva</span>
-            <kbd className="hidden lg:inline text-[10px] font-mono px-1 py-0.2 rounded bg-indigo-700/60 border border-indigo-400/30">
+            <span>Nueva</span>
+            <kbd className="hidden lg:inline text-[10px] font-mono px-1 py-0.2 rounded bg-indigo-700/70 border border-indigo-400/40">
               C
             </kbd>
           </button>
@@ -217,24 +219,24 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Sound Mute / Unmute Button */}
           <button
             onClick={toggleSound}
-            className="p-1.5 rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition-colors"
+            className="p-1.5 rounded-lg border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-850 active:scale-90 transition-all cursor-pointer"
             title={
               sound
                 ? 'Efectos de sonido activados (clic para silenciar)'
-                : 'Efectos de sonido silenciados'
+                : 'Efectos de sonido silenciados (clic para activar)'
             }
           >
             {sound ? (
               <Volume2 className="w-4 h-4 text-indigo-400" />
             ) : (
-              <VolumeX className="w-4 h-4 text-zinc-600" />
+              <VolumeX className="w-4 h-4 text-zinc-500 hover:text-zinc-300" />
             )}
           </button>
 
           {/* Keyboard Shortcuts Helper Button */}
           <button
             onClick={onOpenShortcuts}
-            className="p-1.5 rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition-colors"
+            className="p-1.5 rounded-lg border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-850 active:scale-90 transition-all cursor-pointer"
             title="Atajos de teclado (?)"
           >
             <HelpCircle className="w-4 h-4" />
@@ -243,7 +245,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Settings Button */}
           <button
             onClick={onOpenSettings}
-            className="p-1.5 rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition-colors"
+            className="p-1.5 rounded-lg border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-850 active:scale-90 transition-all cursor-pointer"
             title="Configuración de tasks-api"
           >
             <SettingsIcon className="w-4 h-4" />
@@ -255,7 +257,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-800/40 text-xs">
         {/* Status Filters */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-          <span className="text-zinc-500 text-[11px] uppercase tracking-wider font-semibold mr-1 flex items-center gap-1">
+          <span className="text-zinc-500 text-[11px] uppercase tracking-wider font-semibold mr-1 flex items-center gap-1 select-none">
             <Filter className="w-3 h-3" /> Estado:
           </span>
           {(
@@ -272,10 +274,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 key={item.label}
                 onClick={() => onStatusFilterChange(item.key)}
                 className={cn(
-                  'px-2.5 py-1 rounded-md text-xs transition-colors whitespace-nowrap',
+                  'px-2.5 py-1 rounded-md text-xs transition-all cursor-pointer active:scale-95 border whitespace-nowrap',
                   isSelected
-                    ? 'bg-zinc-800 text-zinc-100 font-medium border border-zinc-700/60 shadow-sm'
-                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60',
+                    ? 'bg-zinc-800 text-zinc-100 font-semibold border-zinc-700 shadow-sm'
+                    : 'bg-transparent text-zinc-400 hover:text-zinc-100 hover:bg-zinc-850 hover:border-zinc-700/80 border-transparent',
                 )}
               >
                 {item.label}
@@ -287,7 +289,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {hasActiveFilters && (
             <button
               onClick={onClearFilters}
-              className="ml-2 flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-colors"
+              className="ml-2 flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold text-amber-300 hover:text-amber-200 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 hover:border-amber-500/50 transition-all cursor-pointer active:scale-95"
               title="Restablecer todos los filtros"
             >
               <RotateCcw className="w-3 h-3" />
@@ -310,12 +312,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Sort Dropdown */}
-          <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-md px-2 py-1">
-            <ArrowUpDown className="w-3 h-3 text-zinc-500" />
+          <div className="flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 rounded-lg px-2.5 py-1 transition-colors cursor-pointer group">
+            <ArrowUpDown className="w-3.5 h-3.5 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
             <select
               value={sortBy}
               onChange={(e) => onSortByChange(e.target.value as SortOption)}
-              className="bg-transparent text-xs text-zinc-300 focus:outline-none cursor-pointer pr-1"
+              className="bg-transparent text-xs text-zinc-300 group-hover:text-zinc-100 focus:outline-none cursor-pointer pr-1"
             >
               <option value="urgency" className="bg-zinc-900 text-zinc-300">
                 Ordenar: Más urgentes
@@ -333,12 +335,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Assignee Dropdown */}
-          <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-md px-2 py-1">
-            <User className="w-3 h-3 text-zinc-500" />
+          <div className="flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 rounded-lg px-2.5 py-1 transition-colors cursor-pointer group">
+            <User className="w-3.5 h-3.5 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
             <select
               value={assigneeFilter || ''}
               onChange={(e) => onAssigneeFilterChange(e.target.value || undefined)}
-              className="bg-transparent text-xs text-zinc-300 focus:outline-none cursor-pointer pr-1"
+              className="bg-transparent text-xs text-zinc-300 group-hover:text-zinc-100 focus:outline-none cursor-pointer pr-1"
             >
               <option value="" className="bg-zinc-900 text-zinc-300">
                 Todos los responsables

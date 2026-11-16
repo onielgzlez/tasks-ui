@@ -70,7 +70,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
 
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-850 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-all cursor-pointer active:scale-95"
           >
             <X className="w-5 h-5" />
           </button>
@@ -112,7 +112,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
           </span>
           <button
             onClick={onClose}
-            className="px-3 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors"
+            className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 hover:text-white text-zinc-200 text-xs font-semibold transition-all cursor-pointer active:scale-95 shadow-sm"
           >
             Entendido
           </button>

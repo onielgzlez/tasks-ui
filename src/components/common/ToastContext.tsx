@@ -70,7 +70,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-zinc-500 hover:text-zinc-300 p-1 rounded-md transition-colors"
+              className="text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 p-1.5 rounded-lg transition-all cursor-pointer active:scale-90"
               aria-label="Cerrar notificación"
             >
               <X className="w-4 h-4" />

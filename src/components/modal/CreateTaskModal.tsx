@@ -122,7 +122,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-850 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-all cursor-pointer active:scale-95"
           >
             <X className="w-5 h-5" />
           </button>
@@ -175,10 +175,10 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                     type="button"
                     onClick={() => setStatus(st)}
                     className={cn(
-                      'flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-medium transition-all',
+                      'flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer active:scale-95 shadow-sm',
                       isSelected
                         ? `${config.bgBadge} ${config.textBadge} ${config.borderBadge} ring-1 ring-inset ring-current`
-                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-850',
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-850 hover:border-zinc-700',
                     )}
                   >
                     <span className={cn('w-1.5 h-1.5 rounded-full', config.dotColor)} />
@@ -286,14 +286,14 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-zinc-100 hover:bg-zinc-850 border border-transparent hover:border-zinc-800 transition-all cursor-pointer active:scale-95"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={createTask.isPending}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/30 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
             >
               {createTask.isPending ? 'Creando...' : 'Crear Tarea'}
             </button>

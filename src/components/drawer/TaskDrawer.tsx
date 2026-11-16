@@ -125,7 +125,7 @@ export const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, knownAssi
 
             <button
               onClick={onClose}
-              className="p-1 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-all cursor-pointer active:scale-95"
               aria-label="Cerrar panel"
             >
               <X className="w-5 h-5" />
@@ -172,10 +172,10 @@ export const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, knownAssi
                       type="button"
                       onClick={() => setFormData((prev) => ({ ...prev, status: st }))}
                       className={cn(
-                        'flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-medium transition-all',
+                        'flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer active:scale-95 shadow-sm',
                         isSelected
                           ? `${config.bgBadge} ${config.textBadge} ${config.borderBadge} ring-1 ring-inset ring-current`
-                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-850',
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-850 hover:border-zinc-700',
                       )}
                     >
                       <span className={cn('w-1.5 h-1.5 rounded-full', config.dotColor)} />
@@ -311,14 +311,14 @@ export const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, knownAssi
                     type="button"
                     onClick={handleDelete}
                     disabled={deleteTask.isPending}
-                    className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-md shadow-rose-600/30 transition-colors"
+                    className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-md shadow-rose-600/30 transition-all cursor-pointer active:scale-95"
                   >
                     Confirmar Borrado
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsConfirmingDelete(false)}
-                    className="px-2.5 py-1.5 rounded-lg text-xs text-zinc-400 hover:text-zinc-200"
+                    className="px-3 py-2 rounded-xl text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-850 transition-colors cursor-pointer active:scale-95"
                   >
                     Cancelar
                   </button>
@@ -327,7 +327,7 @@ export const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, knownAssi
                 <button
                   type="button"
                   onClick={() => setIsConfirmingDelete(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 border border-transparent hover:border-rose-500/30 transition-all cursor-pointer active:scale-95"
                 >
                   <Trash2 className="w-4 h-4" />
                   <span>Eliminar tarea</span>
@@ -338,14 +338,14 @@ export const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, knownAssi
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-3.5 py-2 rounded-xl text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors"
+                  className="px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-zinc-100 hover:bg-zinc-850 border border-zinc-800/80 hover:border-zinc-700 transition-all cursor-pointer active:scale-95"
                 >
                   Cerrar
                 </button>
                 <button
                   type="submit"
                   disabled={updateTask.isPending}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
                 >
                   <Check className="w-4 h-4" />
                   <span>Guardar cambios</span>

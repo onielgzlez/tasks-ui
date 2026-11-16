@@ -11,6 +11,26 @@
     font-family: var(--font-sans);
     letter-spacing: -0.011em;
   }
+
+  /* Clear pointer cursor on all clickable and interactive elements */
+  button,
+  [role='button'],
+  select,
+  summary,
+  a,
+  input[type='submit'],
+  input[type='button'],
+  input[type='reset'],
+  input[type='checkbox'],
+  input[type='radio'] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role='button'][aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 }
 
 /* Custom scrollbars */

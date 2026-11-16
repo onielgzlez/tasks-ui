@@ -93,10 +93,10 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
                 onSelectTask(task);
               }}
               className={cn(
-                'grid grid-cols-12 gap-4 px-5 py-3 items-center text-xs transition-colors cursor-pointer group',
+                'grid grid-cols-12 gap-4 px-5 py-3 items-center text-xs transition-all cursor-pointer group',
                 isSelected
-                  ? 'bg-zinc-850/70 ring-1 ring-inset ring-indigo-500/40'
-                  : 'hover:bg-zinc-900/40',
+                  ? 'bg-zinc-850/80 ring-1 ring-inset ring-indigo-500/50 shadow-sm'
+                  : 'hover:bg-zinc-850/60 hover:shadow-inner',
               )}
             >
               {/* Status pill with cycle button */}
@@ -113,16 +113,17 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
                     updateTask.mutate({ id: task.id, input: { status: next } });
                   }}
                   className={cn(
-                    'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium border transition-transform hover:scale-105 active:scale-95',
+                    'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer shadow-sm',
                     statusConfig.bgBadge,
                     statusConfig.textBadge,
                     statusConfig.borderBadge,
+                    'hover:scale-105 hover:brightness-125 hover:shadow active:scale-95',
                   )}
                   title="Clic para avanzar estado"
                 >
                   <span className={cn('w-1.5 h-1.5 rounded-full', statusConfig.dotColor)} />
                   <span className="hidden sm:inline">{statusConfig.label}</span>
-                  <ChevronRight className="w-3 h-3 opacity-60" />
+                  <ChevronRight className="w-3 h-3 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                 </button>
               </div>
 
@@ -180,7 +181,7 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
                       });
                     }
                   }}
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded text-zinc-500 hover:text-rose-400 transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-zinc-400 hover:text-rose-300 hover:bg-rose-500/20 active:scale-90 transition-all cursor-pointer shadow-sm"
                   title="Eliminar tarea"
                 >
                   <Trash2 className="w-3.5 h-3.5" />

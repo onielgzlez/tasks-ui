@@ -105,7 +105,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
               <button
                 onClick={() => onQuickCreateInStatus(columnStatus)}
-                className="p-1 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-850 transition-colors"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 bg-zinc-900/60 hover:bg-zinc-800 border border-transparent hover:border-zinc-700 transition-all cursor-pointer active:scale-95 shadow-sm"
                 title={`Crear tarea en ${config.label}`}
               >
                 <Plus className="w-4 h-4" />
@@ -121,13 +121,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     isTarget ? 'border-indigo-500/60 bg-indigo-500/5' : 'border-zinc-850',
                   )}
                 >
-                  <p className="text-xs text-zinc-500 font-medium">
+                  <p className="text-xs text-zinc-400 font-medium">
                     {isTarget ? 'Suelta aquí la tarea' : 'No hay tareas en esta etapa'}
                   </p>
                   {!isTarget && (
                     <button
                       onClick={() => onQuickCreateInStatus(columnStatus)}
-                      className="mt-2 text-xs font-semibold text-indigo-400 hover:text-indigo-300"
+                      className="mt-2.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-400 hover:text-indigo-200 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 hover:border-indigo-500/40 transition-all cursor-pointer active:scale-95 shadow-sm"
                     >
                       + Agregar tarea
                     </button>
