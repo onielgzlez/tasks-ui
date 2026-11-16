@@ -30,6 +30,7 @@ Tasks Studio es una interfaz web de alto rendimiento, estética refinada ("Linea
 ## Arquitectura del Frontend
 
 ### Stack Tecnológico
+
 - **Node.js 24.x** y **pnpm 12.21.0** (homogéneo con el backend).
 - **Vite 6** con **React 19** y **TypeScript** en modo estricto.
 - **Tailwind CSS v4** con variables CSS temáticas (dark / light mode).
@@ -39,11 +40,13 @@ Tasks Studio es una interfaz web de alto rendimiento, estética refinada ("Linea
 - **Vitest** + **Testing Library** para pruebas unitarias de componentes y cliente API.
 
 ### Modelo de Conexión y Autenticación
+
 - Modo Híbrido:
   - En desarrollo, Vite utiliza proxy local hacia `http://127.0.0.1:3000` y lee `VITE_API_TOKEN` de `.env.local` por defecto.
   - La interfaz incluye un Drawer/Modal de Ajustes para inspeccionar la salud de la conexión (`Online`, `Unauthorized`, `Offline`) y permite ingresar o cambiar la URL y el Bearer Token en cualquier momento (persistido en `localStorage`).
 
 ### Estructura de Componentes
+
 - `src/api/`: Cliente HTTP tipado, decodificador de RFC 7807 y hooks de TanStack Query (`useTasks`, `useCreateTask`, `useUpdateTask`, `useDeleteTask`, `useTaskHealth`).
 - `src/components/layout/`: Barra superior de comandos, selector de vistas (Kanban vs. Lista), badge de estado de API, botón de configuración rápida.
 - `src/components/kanban/`: Tablero con 3 columnas (`pendiente`, `en_curso`, `hecha`), tarjetas con acciones rápidas, tags de estado, badge de fecha vencida y transición fluida.
@@ -54,6 +57,7 @@ Tasks Studio es una interfaz web de alto rendimiento, estética refinada ("Linea
 - `src/components/command-palette/`: Buscador global y atajos rápidos accesible con `Cmd+K` o `/`.
 
 ## Experiencia de Usuario y Atajos
+
 - `C`: Abrir modal de nueva tarea.
 - `Cmd+K` o `/`: Abrir paleta de comandos / buscador.
 - `Esc`: Cerrar modales o panel lateral de detalles.
